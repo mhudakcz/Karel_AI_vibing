@@ -79,6 +79,219 @@
     color: var(--muted);
   }
   header .by b { color: var(--accent); }
+  .help-btn {
+    background: #33334a;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .help-btn:hover { background: #40405c; border-color: var(--accent); }
+
+  /* ------- Modal nápovědy ------- */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    max-width: 820px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+  .modal-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    background: var(--panel);
+    z-index: 1;
+  }
+  .modal-header h2 { margin: 0; font-size: 18px; color: var(--accent); }
+  .modal-header .spacer-h { flex: 1; }
+  .modal-close {
+    background: transparent;
+    border: 0;
+    color: var(--muted);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0 6px;
+  }
+  .modal-close:hover { color: var(--accent); }
+  .modal-body { padding: 20px; line-height: 1.55; }
+  .modal-body h3 {
+    color: var(--accent-soft);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 20px 0 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+  }
+  .modal-body h3:first-child { margin-top: 0; }
+  .modal-body p { margin: 6px 0; color: #d0d0dc; }
+  .modal-body code, .modal-body pre {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    background: #13131c;
+    color: var(--accent-soft);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+  .modal-body pre {
+    display: block;
+    padding: 10px 14px;
+    color: var(--text);
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    margin: 8px 0;
+  }
+  .modal-body pre .kw { color: var(--accent); font-weight: 600; }
+  .modal-body pre .cm { color: var(--muted); font-style: italic; }
+  .cmd-grid {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px 16px;
+    align-items: baseline;
+    margin: 8px 0;
+  }
+  .cmd-grid code { white-space: nowrap; }
+  .cmd-grid .desc { color: #d0d0dc; }
+  .tip {
+    background: #2a1e18;
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin: 10px 0;
+    color: #e8e8ee;
+    font-size: 13px;
+  }
+  .modal-body ul { margin: 6px 0; padding-left: 22px; }
+  .modal-body li { margin: 3px 0; }
+  kbd {
+    background: #1a1a22;
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--accent-soft);
+  }
+
+  /* --- Režimy --- */
+  .mode-view { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .mode-view.hidden { display: none; }
+  .mode-actions { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .mode-actions.hidden { display: none; }
+  .mode-actions input[type="text"] {
+    background: #1a1a22; color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 10px; font-family: inherit; font-size: 13px;
+    width: 160px;
+  }
+  .icon-btn {
+    background: #33334a; color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 10px; font-size: 14px; cursor: pointer;
+  }
+  .icon-btn:hover { background: #40405c; }
+
+  /* REPL / režim Příkaz */
+  .cmd-hint, .btn-hint {
+    padding: 10px 14px;
+    background: #1a1a24;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .cmd-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 14px;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 13px;
+    background: #15151e;
+  }
+  .cmd-history .entry { padding: 2px 0; }
+  .cmd-history .entry .prompt { color: var(--accent); margin-right: 8px; }
+  .cmd-history .entry .ok { color: var(--ok); }
+  .cmd-history .entry .err { color: var(--err); }
+  .cmd-input-row {
+    display: flex; gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .cmd-input-row input {
+    flex: 1;
+    background: #1a1a22; color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 8px 12px;
+    font-family: "JetBrains Mono", "Consolas", monospace; font-size: 13px;
+  }
+  .cmd-input-row input:focus { outline: 1px solid var(--accent); }
+
+  /* Režim Tlačítka */
+  .btn-grid {
+    flex: 1;
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-content: start;
+  }
+  .bigcmd {
+    background: linear-gradient(135deg, #3a3a4a 0%, #2a2a3a 100%);
+    border: 2px solid var(--border);
+    color: var(--text);
+    padding: 22px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: transform 0.05s, border-color 0.1s;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .bigcmd .glyph { font-size: 34px; line-height: 1; }
+  .bigcmd:hover { border-color: var(--accent); }
+  .bigcmd:active { transform: scale(0.96); }
+  .bigcmd.primary {
+    background: linear-gradient(135deg, #ff6a00 0%, #c85200 100%);
+    color: #1a1a22;
+    border-color: #ff6a00;
+  }
+  .bigcmd.cond {
+    background: linear-gradient(135deg, #1e3a5a 0%, #152a42 100%);
+    border-color: #2a4a6a;
+  }
+  .btn-counter {
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  .btn-counter b { color: var(--accent); }
   main {
     display: grid;
     grid-template-columns: minmax(320px, 1fr) minmax(400px, 1.3fr);
@@ -177,26 +390,210 @@
   <h1>🤖 Karel</h1>
   <span class="hint">klasická česká syntax · klikni do města pro úpravy</span>
   <span class="spacer-h"></span>
+  <button id="helpBtn" class="help-btn" title="Nápověda (F1)">❔ Nápověda</button>
   <span class="by">výukový nástroj · <b>Magexo</b></span>
 </header>
+
+<!-- ======================= NÁPOVĚDA ======================= -->
+<div id="helpModal" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📖 Nápověda — jazyk Karel</h2>
+      <span class="spacer-h"></span>
+      <button class="modal-close" id="helpClose" aria-label="Zavřít">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <h3>🚀 Jak začít za 30 sekund</h3>
+      <p>Program píšeš do <b>editoru vlevo</b>. Každý příkaz napiš na svůj řádek (velká písmena, diakritika). Pak stiskni <kbd>▶ Spustit</kbd> nebo <kbd>⏭ Krok</kbd> pro pomalé krokování.</p>
+      <div class="tip">💡 <b>Tip:</b> město vpravo je upravitelné — v panelu nahoře přepni nástroj na <b>Značka / Stěna / Karel</b> a klikni do mřížky. Klik na Karla ho otočí. Shift+klik značku odebere.</div>
+
+      <h3>📐 Struktura programu</h3>
+      <p>Program je posloupnost příkazů. Píše se <b>shora dolů</b> a vykonává se ve stejném pořadí. Odsazení (mezery na začátku řádku) nejsou povinné, ale dělají kód čitelnější.</p>
+      <pre><span class="cm">// Jednoduchý program — 3 kroky vpřed a polož značku</span>
+<span class="kw">KROK</span>
+<span class="kw">KROK</span>
+<span class="kw">KROK</span>
+<span class="kw">POLOŽ</span></pre>
+
+      <h3>🔧 Základní příkazy</h3>
+      <div class="cmd-grid">
+        <code>KROK</code>         <span class="desc">posuň se o 1 políčko vpřed (chyba, když je tam stěna)</span>
+        <code>VLEVO-VBOK</code>   <span class="desc">otoč se o 90° doleva</span>
+        <code>POLOŽ</code>        <span class="desc">polož značku na aktuální políčko</span>
+        <code>SEBER</code>        <span class="desc">seber značku z aktuálního políčka (chyba, když tam není)</span>
+      </div>
+
+      <h3>🔁 Opakování — OPAKUJ</h3>
+      <pre><span class="kw">OPAKUJ</span> 4-KRÁT
+  <span class="kw">KROK</span>
+  <span class="kw">VLEVO-VBOK</span>
+<span class="kw">*OPAKUJ</span></pre>
+      <p>Blok mezi <code>OPAKUJ n-KRÁT</code> a <code>*OPAKUJ</code> se provede <code>n</code>-krát. Místo <code>4-KRÁT</code> můžeš napsat <code>4 KRÁT</code> nebo jen <code>4</code>.</p>
+
+      <h3>❓ Podmínka — KDYŽ</h3>
+      <pre><span class="kw">KDYŽ</span> JE-STĚNA
+  <span class="kw">VLEVO-VBOK</span>
+<span class="kw">JINAK</span>
+  <span class="kw">KROK</span>
+<span class="kw">*KDYŽ</span></pre>
+      <p>Větev <code>JINAK</code> je volitelná.</p>
+
+      <h3>♾️ Smyčka — DOKUD</h3>
+      <pre><span class="cm">// dojdi až ke stěně</span>
+<span class="kw">DOKUD</span> NENÍ-STĚNA
+  <span class="kw">KROK</span>
+<span class="kw">*DOKUD</span></pre>
+
+      <h3>🧠 Vlastní procedury — NAUČ</h3>
+      <p>Pojmenovaný blok kódu, který se dá volat jménem. Definice musí být <b>před</b> svým voláním.</p>
+      <pre><span class="kw">NAUČ</span> ČTVEREC
+  <span class="kw">OPAKUJ</span> 4-KRÁT
+    <span class="kw">KROK</span>
+    <span class="kw">VLEVO-VBOK</span>
+  <span class="kw">*OPAKUJ</span>
+<span class="kw">*NAUČ</span>
+
+<span class="cm">// a teď ho použiješ jako normální příkaz:</span>
+ČTVEREC
+ČTVEREC</pre>
+
+      <h3>🔍 Podmínky (používají se po KDYŽ / DOKUD)</h3>
+      <div class="cmd-grid">
+        <code>JE-STĚNA</code>     <span class="desc">před Karlem je stěna nebo okraj města</span>
+        <code>NENÍ-STĚNA</code>   <span class="desc">před Karlem je volno</span>
+        <code>JE-ZNAČKA</code>    <span class="desc">na aktuálním políčku je alespoň jedna značka</span>
+        <code>NENÍ-ZNAČKA</code>  <span class="desc">na aktuálním políčku není značka</span>
+        <code>JE-SEVER</code>     <span class="desc">Karel kouká na sever (nahoru)</span>
+        <code>JE-JIH</code>       <span class="desc">Karel kouká na jih (dolů)</span>
+        <code>JE-VÝCHOD</code>    <span class="desc">Karel kouká na východ (doprava)</span>
+        <code>JE-ZÁPAD</code>     <span class="desc">Karel kouká na západ (doleva)</span>
+      </div>
+
+      <h3>💬 Komentáře</h3>
+      <div class="cmd-grid">
+        <code>// komentář</code>  <span class="desc">do konce řádku</span>
+        <code>{ komentář }</code> <span class="desc">víceřádkový blok</span>
+      </div>
+
+      <h3>🏁 Kompletní příklad</h3>
+      <pre><span class="cm">// Karel obejde celé město po obvodu</span>
+<span class="kw">NAUČ</span> STRANA
+  <span class="kw">DOKUD</span> NENÍ-STĚNA
+    <span class="kw">KROK</span>
+  <span class="kw">*DOKUD</span>
+  <span class="kw">VLEVO-VBOK</span>
+<span class="kw">*NAUČ</span>
+
+<span class="kw">OPAKUJ</span> 4-KRÁT
+  STRANA
+<span class="kw">*OPAKUJ</span></pre>
+
+      <h3>⚙️ Ovládání</h3>
+      <ul>
+        <li><kbd>▶ Spustit</kbd> — spustí celý program (rychlost nastavíš posuvníkem)</li>
+        <li><kbd>⏭ Krok</kbd> — provede <b>jeden</b> další příkaz (dá se mačkat opakovaně)</li>
+        <li><kbd>■ Zastavit</kbd> — přeruší běžící program</li>
+        <li><kbd>⟲ Reset</kbd> — vrátí město i Karla do stavu před spuštěním</li>
+        <li><kbd>F1</kbd> / <kbd>Esc</kbd> — otevře / zavře tuto nápovědu</li>
+      </ul>
+
+      <div class="tip">💡 <b>Začínáš?</b> V pravém horním rohu editoru máš rozbalovačku <b>příklad</b> — vyber některý a uvidíš hotové programy s předpřipraveným městem.</div>
+
+    </div>
+  </div>
+</div>
 
 <main>
   <section class="pane">
     <div class="pane-header">
-      <span>Program</span>
+      <div class="seg" id="modeTabs" title="Způsob, jakým ovládáš Karla">
+        <button data-mode="program" class="active">📝 Program</button>
+        <button data-mode="cmd">⚡ Příkaz</button>
+        <button data-mode="btn">🎮 Tlačítka</button>
+      </div>
       <div class="spacer"></div>
-      <label>příklad:
-        <select id="examples">
-          <option value="">— zvol —</option>
-          <option value="ctverec">Čtverec</option>
-          <option value="posbirej">Posbírej řadu</option>
-          <option value="stena">Dojdi ke stěně</option>
-          <option value="schody">Vyjdi schody</option>
-          <option value="prohodka">Procházka po obvodu</option>
-        </select>
-      </label>
+
+      <!-- akce pro režim Program -->
+      <div class="mode-actions" data-for="program">
+        <label>příklad:
+          <select id="examples">
+            <option value="">— zvol —</option>
+            <option value="ctverec">Čtverec</option>
+            <option value="posbirej">Posbírej řadu</option>
+            <option value="stena">Dojdi ke stěně</option>
+            <option value="schody">Vyjdi schody</option>
+            <option value="prohodka">Procházka po obvodu</option>
+          </select>
+        </label>
+        <label>moje:
+          <select id="myPrograms" title="Tvoje uložené programy">
+            <option value="">— uložené —</option>
+          </select>
+        </label>
+        <button class="icon-btn" id="saveProg" title="Uložit aktuální program">💾</button>
+        <button class="icon-btn" id="renameProg" title="Přejmenovat vybraný">✏️</button>
+        <button class="icon-btn" id="deleteProg" title="Smazat vybraný">🗑</button>
+        <button class="icon-btn" id="newProg" title="Nový prázdný program">＋</button>
+      </div>
+
+      <!-- akce pro režim Příkaz -->
+      <div class="mode-actions hidden" data-for="cmd">
+        <span style="color:var(--muted); font-size:12px">REPL · Enter provede, svět se nereseetuje</span>
+      </div>
+
+      <!-- akce pro režim Tlačítka -->
+      <div class="mode-actions hidden" data-for="btn">
+        <button class="icon-btn" id="btnUndo" title="Zpět">↶ Zpět</button>
+        <span style="color:var(--muted); font-size:12px">klik = hned provede</span>
+      </div>
     </div>
-    <textarea id="editor" spellcheck="false" autocomplete="off"></textarea>
+
+    <!-- Režim Program -->
+    <div class="mode-view" id="viewProgram">
+      <textarea id="editor" spellcheck="false" autocomplete="off"></textarea>
+    </div>
+
+    <!-- Režim Příkaz (REPL) -->
+    <div class="mode-view hidden" id="viewCmd">
+      <div class="cmd-hint">
+        Zadej <b>jeden příkaz</b> nebo krátkou posloupnost a stiskni Enter.
+        Karel ho provede <b>hned</b> — svět si zachová stav. <kbd>↑</kbd>/<kbd>↓</kbd> prochází historii.
+      </div>
+      <div id="cmdHistory" class="cmd-history"></div>
+      <div class="cmd-input-row">
+        <input id="cmdInput" type="text" spellcheck="false" autocomplete="off"
+               placeholder="např.  KROK   nebo   OPAKUJ 3-KRÁT KROK *OPAKUJ">
+        <button id="cmdRun" class="primary">Provést</button>
+      </div>
+    </div>
+
+    <!-- Režim Tlačítka -->
+    <div class="mode-view hidden" id="viewBtn">
+      <div class="btn-hint">
+        Pro mrňousy a začátečníky — klikni na tlačítko a Karel hned poslechne.
+        Svět si zachová stav, <b>Reset</b> tě vrátí na začátek.
+      </div>
+      <div class="btn-grid">
+        <button class="bigcmd primary" data-cmd="KROK">
+          <span class="glyph">⬆</span><span>KROK</span>
+        </button>
+        <button class="bigcmd primary" data-cmd="VLEVO-VBOK">
+          <span class="glyph">↺</span><span>VLEVO-VBOK</span>
+        </button>
+        <button class="bigcmd" data-cmd="POLOŽ">
+          <span class="glyph">⊕</span><span>POLOŽ značku</span>
+        </button>
+        <button class="bigcmd" data-cmd="SEBER">
+          <span class="glyph">⊖</span><span>SEBER značku</span>
+        </button>
+      </div>
+      <div class="btn-counter" id="btnCounter">
+        Kroků: <b id="cntSteps">0</b> · Otočení: <b id="cntTurns">0</b> ·
+        Položených: <b id="cntPut">0</b> · Sebraných: <b id="cntPick">0</b>
+      </div>
+    </div>
+
     <div id="status" class="status">Připraven.</div>
   </section>
 
@@ -862,14 +1259,20 @@ function compile() {
   return parser.parseProgram();
 }
 
-async function runProgram(stepMode = false) {
+async function runProgram(stepMode = false, opts = {}) {
+  const { code = null, reset = true, silent = false } = opts;
   let program;
-  try { program = compile(); }
-  catch (e) { setStatus("⚠ " + e.message, "err"); return; }
+  try {
+    const src = code !== null ? code : editor.value;
+    program = new Parser(tokenize(src)).parseProgram();
+  }
+  catch (e) { setStatus("⚠ " + e.message, "err"); return false; }
 
-  // reset do uloženého stavu
-  world.restore(savedWorld);
-  redraw();
+  if (reset) {
+    // reset do uloženého stavu
+    world.restore(savedWorld);
+    redraw();
+  }
 
   interp = new Interpreter(program, world);
   const gen = interp.run();
@@ -889,22 +1292,25 @@ async function runProgram(stepMode = false) {
       if (+speedEl.value > 0) await delay();
     }
     if (!stepMode) {
-      setStatus(interp.stopped ? "Zastaveno." : "✓ Hotovo.", interp.stopped ? "" : "ok");
+      if (!silent) setStatus(interp.stopped ? "Zastaveno." : "✓ Hotovo.", interp.stopped ? "" : "ok");
     } else {
       setStatus("Krok proveden.");
       // v krokovacím režimu si necháme generátor v paměti
-      if (!running) return;
+      if (!running) return true;
       running = false; updateButtons();
       window._stepGen = gen; // pokračování na další [Krok]
-      return;
+      return true;
     }
   } catch (e) {
     setStatus("⚠ " + e.message, "err");
+    running = false; window._stepGen = null; updateButtons(); redraw();
+    return false;
   }
   running = false;
   window._stepGen = null;
   updateButtons();
   redraw();
+  return true;
 }
 
 function stepProgram() {
@@ -1049,6 +1455,207 @@ document.getElementById("examples").addEventListener("change", (ev) => {
 });
 
 // =====================================================================
+// NÁPOVĚDA (modální okno)
+// =====================================================================
+const helpModal = document.getElementById("helpModal");
+function toggleHelp(open) {
+  if (open === undefined) helpModal.classList.toggle("open");
+  else helpModal.classList.toggle("open", open);
+}
+document.getElementById("helpBtn").addEventListener("click", () => toggleHelp(true));
+document.getElementById("helpClose").addEventListener("click", () => toggleHelp(false));
+helpModal.addEventListener("click", (e) => { if (e.target === helpModal) toggleHelp(false); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "F1") { e.preventDefault(); toggleHelp(); }
+  if (e.key === "Escape" && helpModal.classList.contains("open")) toggleHelp(false);
+});
+
+// =====================================================================
+// REŽIMY (Program / Příkaz / Tlačítka)
+// =====================================================================
+let currentMode = "program";
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll("#modeTabs button").forEach(b =>
+    b.classList.toggle("active", b.dataset.mode === mode));
+  // view panels
+  document.getElementById("viewProgram").classList.toggle("hidden", mode !== "program");
+  document.getElementById("viewCmd").classList.toggle("hidden", mode !== "cmd");
+  document.getElementById("viewBtn").classList.toggle("hidden", mode !== "btn");
+  // actions v pane-header
+  document.querySelectorAll(".mode-actions").forEach(el =>
+    el.classList.toggle("hidden", el.dataset.for !== mode));
+  // když přepneme do cmd, fokus na input
+  if (mode === "cmd") setTimeout(() => document.getElementById("cmdInput").focus(), 0);
+}
+document.querySelectorAll("#modeTabs button").forEach(b =>
+  b.addEventListener("click", () => setMode(b.dataset.mode)));
+
+// =====================================================================
+// REPL — režim Příkaz
+// =====================================================================
+const cmdInput = document.getElementById("cmdInput");
+const cmdHistory = document.getElementById("cmdHistory");
+const cmdHistStack = [];  // historie příkazů pro ↑/↓
+let cmdHistIdx = -1;
+
+function appendHistory(cmd, result) {
+  const div = document.createElement("div");
+  div.className = "entry";
+  const safe = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  div.innerHTML = `<span class="prompt">&gt;</span>${safe(cmd)} ` +
+                  (result.ok ? `<span class="ok">✓</span>` :
+                               `<span class="err">⚠ ${safe(result.msg)}</span>`);
+  cmdHistory.appendChild(div);
+  cmdHistory.scrollTop = cmdHistory.scrollHeight;
+}
+
+async function runCmd(code) {
+  if (!code.trim()) return;
+  cmdHistStack.push(code);
+  cmdHistIdx = cmdHistStack.length;
+  const ok = await runProgram(false, { code, reset: false, silent: true });
+  const statusText = statusEl.textContent;
+  appendHistory(code, ok
+    ? { ok: true }
+    : { ok: false, msg: statusText.replace(/^⚠\s*/, "") });
+  if (ok) setStatus("✓ Hotovo.", "ok");
+}
+
+document.getElementById("cmdRun").addEventListener("click", () => {
+  const v = cmdInput.value;
+  cmdInput.value = "";
+  runCmd(v);
+});
+cmdInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const v = cmdInput.value;
+    cmdInput.value = "";
+    runCmd(v);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    if (cmdHistStack.length === 0) return;
+    cmdHistIdx = Math.max(0, cmdHistIdx - 1);
+    cmdInput.value = cmdHistStack[cmdHistIdx] || "";
+  } else if (e.key === "ArrowDown") {
+    e.preventDefault();
+    cmdHistIdx = Math.min(cmdHistStack.length, cmdHistIdx + 1);
+    cmdInput.value = cmdHistStack[cmdHistIdx] || "";
+  }
+});
+
+// =====================================================================
+// TLAČÍTKA — režim Tlačítka
+// =====================================================================
+const counters = { steps: 0, turns: 0, put: 0, pick: 0 };
+function updateCounters() {
+  document.getElementById("cntSteps").textContent = counters.steps;
+  document.getElementById("cntTurns").textContent = counters.turns;
+  document.getElementById("cntPut").textContent = counters.put;
+  document.getElementById("cntPick").textContent = counters.pick;
+}
+const btnHistory = []; // pro "zpět"
+document.querySelectorAll(".bigcmd").forEach(b => {
+  b.addEventListener("click", async () => {
+    if (running) return;
+    const cmd = b.dataset.cmd;
+    const before = world.clone();
+    const ok = await runProgram(false, { code: cmd, reset: false, silent: true });
+    if (ok) {
+      btnHistory.push(before);
+      if (btnHistory.length > 200) btnHistory.shift();
+      if (cmd === "KROK") counters.steps++;
+      else if (cmd === "VLEVO-VBOK") counters.turns++;
+      else if (cmd === "POLOŽ") counters.put++;
+      else if (cmd === "SEBER") counters.pick++;
+      updateCounters();
+      setStatus(`✓ ${cmd}`, "ok");
+    }
+  });
+});
+document.getElementById("btnUndo").addEventListener("click", () => {
+  if (running) return;
+  const prev = btnHistory.pop();
+  if (!prev) { setStatus("Nic k vrácení."); return; }
+  world.restore(prev);
+  redraw();
+  setStatus("↶ Vráceno o krok zpět.");
+});
+
+// =====================================================================
+// KNIHOVNA PROGRAMŮ (localStorage)
+// =====================================================================
+const STORAGE_KEY = "karel.programs.v1";
+function loadLib() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+  catch { return {}; }
+}
+function saveLib(lib) { localStorage.setItem(STORAGE_KEY, JSON.stringify(lib)); }
+function refreshProgramList(selected = "") {
+  const sel = document.getElementById("myPrograms");
+  const lib = loadLib();
+  const names = Object.keys(lib).sort();
+  sel.innerHTML = `<option value="">— uložené (${names.length}) —</option>` +
+    names.map(n => `<option value="${n.replace(/"/g, "&quot;")}"${n === selected ? " selected" : ""}>${n}</option>`).join("");
+}
+document.getElementById("myPrograms").addEventListener("change", (e) => {
+  const name = e.target.value;
+  if (!name) return;
+  const lib = loadLib();
+  if (lib[name] !== undefined) {
+    editor.value = lib[name];
+    setStatus(`Načten program „${name}".`);
+  }
+});
+document.getElementById("saveProg").addEventListener("click", () => {
+  const sel = document.getElementById("myPrograms");
+  const current = sel.value;
+  const suggested = current || "Můj program";
+  const name = prompt("Pod jakým jménem uložit program?", suggested);
+  if (!name) return;
+  const lib = loadLib();
+  const exists = lib[name] !== undefined;
+  if (exists && !confirm(`Program „${name}" už existuje. Přepsat?`)) return;
+  lib[name] = editor.value;
+  saveLib(lib);
+  refreshProgramList(name);
+  setStatus(`💾 Uloženo jako „${name}".`, "ok");
+});
+document.getElementById("renameProg").addEventListener("click", () => {
+  const sel = document.getElementById("myPrograms");
+  const name = sel.value;
+  if (!name) { setStatus("Nejdřív vyber uložený program."); return; }
+  const newName = prompt("Nové jméno:", name);
+  if (!newName || newName === name) return;
+  const lib = loadLib();
+  if (lib[newName] !== undefined && !confirm(`„${newName}" už existuje. Přepsat?`)) return;
+  lib[newName] = lib[name];
+  delete lib[name];
+  saveLib(lib);
+  refreshProgramList(newName);
+  setStatus(`✏️ Přejmenováno na „${newName}".`);
+});
+document.getElementById("deleteProg").addEventListener("click", () => {
+  const sel = document.getElementById("myPrograms");
+  const name = sel.value;
+  if (!name) { setStatus("Nejdřív vyber uložený program."); return; }
+  if (!confirm(`Opravdu smazat program „${name}"?`)) return;
+  const lib = loadLib();
+  delete lib[name];
+  saveLib(lib);
+  refreshProgramList();
+  setStatus(`🗑 Smazáno „${name}".`);
+});
+document.getElementById("newProg").addEventListener("click", () => {
+  if (editor.value.trim() && !confirm("Zahodit aktuální kód v editoru?")) return;
+  editor.value = "// Nový program — piš sem příkazy\n";
+  document.getElementById("myPrograms").value = "";
+  setStatus("📝 Nový program.");
+  editor.focus();
+});
+
+// =====================================================================
 // START
 // =====================================================================
 editor.value =
@@ -1060,6 +1667,8 @@ VLEVO-VBOK
 POLOŽ`;
 snapshot();
 redraw();
+refreshProgramList();
+updateCounters();
 window.addEventListener("resize", redraw);
 </script>
 </body>

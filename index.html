@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<title>Karel — Magexo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23ff6a00'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='20' font-weight='900' text-anchor='middle' fill='%231a1a22'%3EM%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #1e1e28;
+    --panel: #272733;
+    --border: #3a3a4a;
+    --text: #e8e8ee;
+    --muted: #9a9aae;
+    --accent: #ff6a00;   /* Magexo oranžová */
+    --accent-soft: #ffb84a;
+    --accent2: #6bd4ff;
+    --err: #ff6b7a;
+    --ok: #7ee08a;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+  }
+  header {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(90deg, #1e1e28 0%, #2a1e18 100%);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--accent) 0%, #ff8a3d 100%);
+    color: #1a1a22;
+    font-size: 14px;
+  }
+  .brand-mark {
+    display: inline-block;
+    width: 16px; height: 16px;
+    background: #1a1a22;
+    border-radius: 3px;
+    position: relative;
+  }
+  .brand-mark::before {
+    content: "M";
+    position: absolute;
+    inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 900;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-soft);
+  }
+  header .hint { color: var(--muted); font-size: 12px; }
+  header .spacer-h { flex: 1; }
+  header .by {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  header .by b { color: var(--accent); }
+  main {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) minmax(400px, 1.3fr);
+    gap: 1px;
+    background: var(--border);
+    overflow: hidden;
+  }
+  .pane { background: var(--panel); display: flex; flex-direction: column; min-height: 0; }
+  .pane-header {
+    padding: 6px 12px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  #editor {
+    flex: 1;
+    font-family: "JetBrains Mono", "Consolas", "Menlo", monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    background: #1a1a22;
+    color: var(--text);
+    border: 0;
+    outline: 0;
+    padding: 12px;
+    resize: none;
+    white-space: pre;
+    tab-size: 2;
+  }
+  .canvas-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #13131a;
+    padding: 10px;
+    min-height: 0;
+  }
+  canvas { background: #0e0e14; border: 1px solid var(--border); display: block; }
+  footer {
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  button, select, input[type="number"] {
+    background: #33334a;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  button:hover { background: #40405c; }
+  button.primary { background: var(--accent); color: #1a1a22; border-color: var(--accent); font-weight: 600; }
+  button.primary:hover { background: #ffc76a; }
+  button.danger { background: #4a2a2a; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .seg button { border-radius: 0; border: 0; border-right: 1px solid var(--border); padding: 6px 10px; background: #2a2a38; }
+  .seg button:last-child { border-right: 0; }
+  .seg button.active { background: var(--accent2); color: #0e0e14; font-weight: 600; }
+  input[type="range"] { vertical-align: middle; }
+  .status {
+    padding: 8px 12px;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    min-height: 32px;
+    white-space: pre-wrap;
+  }
+  .status.err { color: var(--err); }
+  .status.ok { color: var(--ok); }
+  label { font-size: 12px; color: var(--muted); }
+  .spacer { flex: 1; }
+  @media (max-width: 800px) {
+    main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="brand" href="https://magexo.cz" target="_blank" rel="noopener">
+    <span class="brand-mark"></span>Magexo
+  </a>
+  <h1>🤖 Karel</h1>
+  <span class="hint">klasická česká syntax · klikni do města pro úpravy</span>
+  <span class="spacer-h"></span>
+  <span class="by">výukový nástroj · <b>Magexo</b></span>
+</header>
+
+<main>
+  <section class="pane">
+    <div class="pane-header">
+      <span>Program</span>
+      <div class="spacer"></div>
+      <label>příklad:
+        <select id="examples">
+          <option value="">— zvol —</option>
+          <option value="ctverec">Čtverec</option>
+          <option value="posbirej">Posbírej řadu</option>
+          <option value="stena">Dojdi ke stěně</option>
+          <option value="schody">Vyjdi schody</option>
+          <option value="prohodka">Procházka po obvodu</option>
+        </select>
+      </label>
+    </div>
+    <textarea id="editor" spellcheck="false" autocomplete="off"></textarea>
+    <div id="status" class="status">Připraven.</div>
+  </section>
+
+  <section class="pane">
+    <div class="pane-header">
+      <span>Město</span>
+      <div class="seg" id="toolbar" title="Co se stane po kliknutí do buňky">
+        <button data-tool="beeper" class="active">Značka</button>
+        <button data-tool="wall-n">Stěna nahoře</button>
+        <button data-tool="wall-e">Stěna vpravo</button>
+        <button data-tool="karel">Karel</button>
+      </div>
+      <div class="spacer"></div>
+      <label>š <input id="cols" type="number" value="10" min="3" max="30" style="width:56px"></label>
+      <label>v <input id="rows" type="number" value="10" min="3" max="30" style="width:56px"></label>
+      <button id="clearWorld">Vyčistit</button>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="city" width="600" height="600"></canvas>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <button id="run" class="primary">▶ Spustit</button>
+  <button id="step">⏭ Krok</button>
+  <button id="stop" class="danger" disabled>■ Zastavit</button>
+  <button id="reset">⟲ Reset</button>
+  <div class="spacer"></div>
+  <label>Rychlost
+    <input id="speed" type="range" min="0" max="1000" value="150" step="10" style="width:140px">
+    <span id="speedVal">150 ms</span>
+  </label>
+</footer>
+
+<script>
+"use strict";
+
+// =====================================================================
+// SVĚT (World)
+// =====================================================================
+const DIR = { N: 0, E: 1, S: 2, W: 3 };
+const DIR_NAMES = ["SEVER", "VÝCHOD", "JIH", "ZÁPAD"];
+const DIR_DELTA = { 0: [0, 1], 1: [1, 0], 2: [0, -1], 3: [-1, 0] };
+
+class World {
+  constructor(cols = 10, rows = 10) {
+    this.cols = cols;
+    this.rows = rows;
+    this.karel = { x: 0, y: 0, dir: DIR.E };
+    this.walls = new Set();   // klíče: "x,y,N" nebo "x,y,E"
+    this.beepers = new Map(); // "x,y" -> count
+  }
+  clone() {
+    const w = new World(this.cols, this.rows);
+    w.karel = { ...this.karel };
+    w.walls = new Set(this.walls);
+    w.beepers = new Map(this.beepers);
+    return w;
+  }
+  restore(snap) {
+    this.cols = snap.cols; this.rows = snap.rows;
+    this.karel = { ...snap.karel };
+    this.walls = new Set(snap.walls);
+    this.beepers = new Map(snap.beepers);
+  }
+  inBounds(x, y) { return x >= 0 && y >= 0 && x < this.cols && y < this.rows; }
+  hasWall(x, y, side) {
+    // normalizujeme: stěna "S" buňky (x,y) = stěna "N" buňky (x, y-1)
+    if (side === "S") return this.walls.has(`${x},${y - 1},N`);
+    if (side === "W") return this.walls.has(`${x - 1},${y},E`);
+    return this.walls.has(`${x},${y},${side}`);
+  }
+  toggleWall(x, y, side) {
+    // vždy ukládáme do kanonické podoby N/E
+    let key;
+    if (side === "N") key = `${x},${y},N`;
+    else if (side === "E") key = `${x},${y},E`;
+    else if (side === "S") key = `${x},${y - 1},N`;
+    else if (side === "W") key = `${x - 1},${y},E`;
+    // nezapisuj stěnu mimo hranice
+    const [a, b] = key.split(",").map(Number);
+    if (!this.inBounds(a, b)) return;
+    if (this.walls.has(key)) this.walls.delete(key); else this.walls.add(key);
+  }
+  wallAhead() {
+    const { x, y, dir } = this.karel;
+    if (dir === DIR.N) return this.hasWall(x, y, "N") || y + 1 >= this.rows;
+    if (dir === DIR.E) return this.hasWall(x, y, "E") || x + 1 >= this.cols;
+    if (dir === DIR.S) return this.hasWall(x, y, "S") || y - 1 < 0;
+    if (dir === DIR.W) return this.hasWall(x, y, "W") || x - 1 < 0;
+  }
+  step() {
+    if (this.wallAhead()) throw new Error("Karel narazil do stěny!");
+    const [dx, dy] = DIR_DELTA[this.karel.dir];
+    this.karel.x += dx;
+    this.karel.y += dy;
+  }
+  turnLeft() { this.karel.dir = (this.karel.dir + 3) % 4; }
+  beeperAt(x, y) { return this.beepers.get(`${x},${y}`) || 0; }
+  pickBeeper() {
+    const k = `${this.karel.x},${this.karel.y}`;
+    const n = this.beepers.get(k) || 0;
+    if (n === 0) throw new Error("Na tomto políčku není žádná značka!");
+    if (n === 1) this.beepers.delete(k); else this.beepers.set(k, n - 1);
+  }
+  putBeeper() {
+    const k = `${this.karel.x},${this.karel.y}`;
+    this.beepers.set(k, (this.beepers.get(k) || 0) + 1);
+  }
+  addBeeper(x, y) {
+    const k = `${x},${y}`;
+    this.beepers.set(k, (this.beepers.get(k) || 0) + 1);
+  }
+  removeBeeper(x, y) {
+    const k = `${x},${y}`;
+    const n = this.beepers.get(k) || 0;
+    if (n <= 1) this.beepers.delete(k); else this.beepers.set(k, n - 1);
+  }
+}
+
+// =====================================================================
+// LEXER + PARSER
+// =====================================================================
+// Gramatika:
+//   program     := (def | stmt)*
+//   def         := "NAUČ" name stmt* "*NAUČ"
+//   stmt        := cmd | repeat | ifStmt | whileStmt | call
+//   cmd         := "KROK" | "VLEVO-VBOK" | "POLOŽ" | "SEBER"
+//   repeat      := "OPAKUJ" number ["KRÁT"] stmt* "*OPAKUJ"
+//   ifStmt      := "KDYŽ" cond stmt* ["JINAK" stmt*] "*KDYŽ"
+//   whileStmt   := "DOKUD" cond stmt* "*DOKUD"
+//   cond        := JE-STĚNA | NENÍ-STĚNA | JE-ZNAČKA | NENÍ-ZNAČKA
+//                | JE-SEVER | JE-JIH | JE-VÝCHOD | JE-ZÁPAD
+//   call        := name (uživatelská procedura)
+
+const KEYWORDS = new Set([
+  "NAUČ", "*NAUČ",
+  "OPAKUJ", "*OPAKUJ", "KRÁT",
+  "KDYŽ", "*KDYŽ", "JINAK",
+  "DOKUD", "*DOKUD",
+  "KROK", "VLEVO-VBOK", "POLOŽ", "SEBER",
+]);
+const CONDITIONS = new Set([
+  "JE-STĚNA", "NENÍ-STĚNA", "JE-ZNAČKA", "NENÍ-ZNAČKA",
+  "JE-SEVER", "JE-JIH", "JE-VÝCHOD", "JE-ZÁPAD",
+]);
+
+function tokenize(src) {
+  // odstraň komentáře: // do konce řádku, { ... } blokové
+  src = src.replace(/\/\/[^\n]*/g, " ").replace(/\{[\s\S]*?\}/g, " ");
+  const out = [];
+  let i = 0, line = 1;
+  while (i < src.length) {
+    const c = src[i];
+    if (c === "\n") { line++; i++; continue; }
+    if (/\s/.test(c)) { i++; continue; }
+    // číslo
+    if (/\d/.test(c)) {
+      let j = i;
+      while (j < src.length && /\d/.test(src[j])) j++;
+      out.push({ type: "NUM", value: parseInt(src.slice(i, j), 10), line });
+      i = j;
+      // volitelně "-KRÁT" připojené za číslem
+      if (src.slice(i).toUpperCase().startsWith("-KRÁT")) {
+        out.push({ type: "KW", value: "KRÁT", line });
+        i += 5;
+      }
+      continue;
+    }
+    // token: písmena, *, -, diakritika
+    let j = i;
+    while (j < src.length && !/\s/.test(src[j])) j++;
+    const raw = src.slice(i, j);
+    i = j;
+    const upper = raw.toUpperCase();
+    if (KEYWORDS.has(upper)) out.push({ type: "KW", value: upper, line });
+    else if (CONDITIONS.has(upper)) out.push({ type: "COND", value: upper, line });
+    else out.push({ type: "ID", value: upper, line });
+  }
+  return out;
+}
+
+class Parser {
+  constructor(tokens) { this.t = tokens; this.i = 0; }
+  peek() { return this.t[this.i]; }
+  eat() { return this.t[this.i++]; }
+  expect(type, value) {
+    const t = this.eat();
+    if (!t) throw new Error(`Očekáván ${value || type}, ale dosažen konec programu.`);
+    if (t.type !== type || (value && t.value !== value))
+      throw new Error(`Řádek ${t.line}: očekáván „${value || type}", nalezeno „${t.value}".`);
+    return t;
+  }
+  parseProgram() {
+    const procs = new Map();
+    const main = [];
+    while (this.peek()) {
+      const t = this.peek();
+      if (t.type === "KW" && t.value === "NAUČ") {
+        const { name, body } = this.parseDef();
+        if (procs.has(name)) throw new Error(`Procedura „${name}" je definována víckrát.`);
+        procs.set(name, body);
+      } else {
+        main.push(this.parseStmt());
+      }
+    }
+    return { procs, main };
+  }
+  parseDef() {
+    this.expect("KW", "NAUČ");
+    const nameTok = this.eat();
+    if (!nameTok || nameTok.type !== "ID")
+      throw new Error(`Po NAUČ musí být jméno procedury.`);
+    const body = [];
+    while (this.peek() && !(this.peek().type === "KW" && this.peek().value === "*NAUČ")) {
+      body.push(this.parseStmt());
+    }
+    this.expect("KW", "*NAUČ");
+    return { name: nameTok.value, body };
+  }
+  parseStmt() {
+    const t = this.peek();
+    if (!t) throw new Error("Neočekávaný konec programu.");
+    if (t.type === "KW") {
+      if (t.value === "KROK" || t.value === "VLEVO-VBOK" ||
+          t.value === "POLOŽ" || t.value === "SEBER") {
+        this.eat();
+        return { kind: "cmd", name: t.value, line: t.line };
+      }
+      if (t.value === "OPAKUJ") return this.parseRepeat();
+      if (t.value === "KDYŽ") return this.parseIf();
+      if (t.value === "DOKUD") return this.parseWhile();
+      throw new Error(`Řádek ${t.line}: neočekávané klíčové slovo „${t.value}".`);
+    }
+    if (t.type === "ID") {
+      this.eat();
+      return { kind: "call", name: t.value, line: t.line };
+    }
+    throw new Error(`Řádek ${t.line}: neočekávaný token „${t.value}".`);
+  }
+  parseRepeat() {
+    const kw = this.expect("KW", "OPAKUJ");
+    const num = this.eat();
+    if (!num || num.type !== "NUM")
+      throw new Error(`Řádek ${kw.line}: po OPAKUJ musí být počet opakování.`);
+    // volitelné KRÁT
+    if (this.peek() && this.peek().type === "KW" && this.peek().value === "KRÁT") this.eat();
+    const body = [];
+    while (this.peek() && !(this.peek().type === "KW" && this.peek().value === "*OPAKUJ")) {
+      body.push(this.parseStmt());
+    }
+    this.expect("KW", "*OPAKUJ");
+    return { kind: "repeat", count: num.value, body, line: kw.line };
+  }
+  parseIf() {
+    const kw = this.expect("KW", "KDYŽ");
+    const cond = this.eat();
+    if (!cond || cond.type !== "COND")
+      throw new Error(`Řádek ${kw.line}: po KDYŽ musí být podmínka (např. JE-STĚNA).`);
+    const then_ = [];
+    const else_ = [];
+    while (this.peek() &&
+           !(this.peek().type === "KW" && (this.peek().value === "*KDYŽ" || this.peek().value === "JINAK"))) {
+      then_.push(this.parseStmt());
+    }
+    if (this.peek() && this.peek().type === "KW" && this.peek().value === "JINAK") {
+      this.eat();
+      while (this.peek() && !(this.peek().type === "KW" && this.peek().value === "*KDYŽ")) {
+        else_.push(this.parseStmt());
+      }
+    }
+    this.expect("KW", "*KDYŽ");
+    return { kind: "if", cond: cond.value, then: then_, else: else_, line: kw.line };
+  }
+  parseWhile() {
+    const kw = this.expect("KW", "DOKUD");
+    const cond = this.eat();
+    if (!cond || cond.type !== "COND")
+      throw new Error(`Řádek ${kw.line}: po DOKUD musí být podmínka.`);
+    const body = [];
+    while (this.peek() && !(this.peek().type === "KW" && this.peek().value === "*DOKUD")) {
+      body.push(this.parseStmt());
+    }
+    this.expect("KW", "*DOKUD");
+    return { kind: "while", cond: cond.value, body, line: kw.line };
+  }
+}
+
+// =====================================================================
+// INTERPRETER (asynchronní generátor, aby šla animace)
+// =====================================================================
+function evalCond(cond, world) {
+  switch (cond) {
+    case "JE-STĚNA":    return world.wallAhead();
+    case "NENÍ-STĚNA":  return !world.wallAhead();
+    case "JE-ZNAČKA":   return world.beeperAt(world.karel.x, world.karel.y) > 0;
+    case "NENÍ-ZNAČKA": return world.beeperAt(world.karel.x, world.karel.y) === 0;
+    case "JE-SEVER":    return world.karel.dir === DIR.N;
+    case "JE-JIH":      return world.karel.dir === DIR.S;
+    case "JE-VÝCHOD":   return world.karel.dir === DIR.E;
+    case "JE-ZÁPAD":    return world.karel.dir === DIR.W;
+  }
+  throw new Error(`Neznámá podmínka „${cond}".`);
+}
+
+class Interpreter {
+  constructor(program, world) {
+    this.program = program;
+    this.world = world;
+    this.stopped = false;
+    this.maxSteps = 200000; // pojistka proti nekonečným smyčkám
+    this.steps = 0;
+  }
+  stop() { this.stopped = true; }
+
+  // generátor vrací „tick" po každém viditelném kroku (pohyb, otočení, značka)
+  *run() {
+    yield* this.execBlock(this.program.main);
+  }
+  *execBlock(block) {
+    for (const s of block) {
+      if (this.stopped) return;
+      if (++this.steps > this.maxSteps) throw new Error("Překročen limit kroků (nekonečná smyčka?).");
+      yield* this.execStmt(s);
+    }
+  }
+  *execStmt(s) {
+    switch (s.kind) {
+      case "cmd": {
+        if (s.name === "KROK") this.world.step();
+        else if (s.name === "VLEVO-VBOK") this.world.turnLeft();
+        else if (s.name === "POLOŽ") this.world.putBeeper();
+        else if (s.name === "SEBER") this.world.pickBeeper();
+        yield { kind: "tick", line: s.line };
+        return;
+      }
+      case "repeat": {
+        for (let i = 0; i < s.count; i++) {
+          if (this.stopped) return;
+          yield* this.execBlock(s.body);
+        }
+        return;
+      }
+      case "if": {
+        if (evalCond(s.cond, this.world)) yield* this.execBlock(s.then);
+        else yield* this.execBlock(s.else);
+        return;
+      }
+      case "while": {
+        while (!this.stopped && evalCond(s.cond, this.world)) {
+          if (++this.steps > this.maxSteps) throw new Error("Překročen limit kroků (nekonečná smyčka?).");
+          yield* this.execBlock(s.body);
+        }
+        return;
+      }
+      case "call": {
+        const body = this.program.procs.get(s.name);
+        if (!body) throw new Error(`Řádek ${s.line}: neznámá procedura „${s.name}".`);
+        yield* this.execBlock(body);
+        return;
+      }
+    }
+  }
+}
+
+// =====================================================================
+// VYKRESLENÍ
+// =====================================================================
+const canvas = document.getElementById("city");
+const ctx = canvas.getContext("2d");
+
+function fitCanvas(world) {
+  const wrap = canvas.parentElement;
+  const size = Math.min(wrap.clientWidth - 20, wrap.clientHeight - 20);
+  const cell = Math.floor(size / Math.max(world.cols, world.rows));
+  canvas.width = cell * world.cols;
+  canvas.height = cell * world.rows;
+  return cell;
+}
+
+// --- Pixel-art sprity (16×16) ---
+const SPRITE_SIZE = 16;
+const PALETTE = {
+  '.': null,
+  'K': '#2a1418',  // tmavý obrys
+  'R': '#a83545',  // tmavě červená (stín těla)
+  'r': '#ff6b7a',  // světle červená (tělo)
+  'W': '#ffffff',  // bílá (oko)
+  'B': '#0e0e14',  // černá (zornice, obrys)
+  'O': '#ff6a00',  // Magexo oranžová (LED, pás)
+  'o': '#ffcc44',  // žlutá (LED highlight)
+  'G': '#2a2a38',  // tmavě šedá (displej tmavý)
+  'g': '#b8b8c8',  // světle šedá (kov)
+  's': '#6b6b84',  // střední šedá (nohy stín)
+  'H': '#ffffff',  // highlight bílá
+};
+
+// Karel — robot orientovaný na VÝCHOD (dir=1). Ostatní směry = rotace canvasu.
+// Pohled: zepředu/seshora mix, s anténou nahoře a "přední LED" vpravo (ukazuje směr).
+const KAREL_SPRITE = [
+  "................",
+  "................",
+  "..........o.....",  // anténa – LED
+  "..........K.....",
+  "..........K.....",
+  "....KKKKKKKKK...",  // horní rám hlavy
+  "...KggggggggRK..",
+  "..KrrWBrrrrWBOK.",  // oči – druhé je oranžová LED ukazující vpřed
+  "..KrrWBrrrrWBOK.",
+  "..KRRRRRRRRRRRK.",
+  "...KRRRRRRRRRK..",
+  "...KKKKKKKKKKK..",  // krk/ramena
+  "..KrrrrOOOOrrrK.",  // trup s oranžovým pásem
+  "..KrRGGGGGGGGrK.",  // displej
+  "..KRRRRRRRRRRRK.",
+  "...Ks..KKKK..sK.",  // nohy
+];
+
+// Značka (beeper) — pixel-art krystal
+const BEEPER_SPRITE = [
+  "................",
+  "................",
+  "................",
+  "................",
+  ".......bb.......",
+  "......bWWb......",
+  ".....bWccWb.....",
+  "....bWccccWb....",
+  "....bWccccWb....",
+  ".....bWccWb.....",
+  "......bWWb......",
+  ".......bb.......",
+  "................",
+  "................",
+  "................",
+  "................",
+];
+const BEEPER_PALETTE = {
+  '.': null,
+  'b': '#1a5f8a',  // tmavý obrys krystalu
+  'W': '#ffffff',  // lesk
+  'c': '#6bd4ff',  // azurový střed
+};
+
+function drawSprite(sprite, palette, topLeftX, topLeftY, cell, dir) {
+  const size = sprite.length;
+  const px = cell / size;
+  for (let sy = 0; sy < size; sy++) {
+    const row = sprite[sy];
+    for (let sx = 0; sx < row.length; sx++) {
+      const color = palette[row[sx]];
+      if (!color) continue;
+      // transformace souřadnic podle směru (0°, 90°, 180°, 270°)
+      let dx, dy;
+      switch (dir) {
+        case 1: dx = sx;              dy = sy;              break; // E
+        case 0: dx = sy;              dy = size - 1 - sx;   break; // N
+        case 2: dx = size - 1 - sx;   dy = size - 1 - sy;   break; // S
+        case 3: dx = size - 1 - sy;   dy = sx;              break; // W
+      }
+      const x = Math.round(topLeftX + dx * px);
+      const y = Math.round(topLeftY + dy * px);
+      const x2 = Math.round(topLeftX + (dx + 1) * px);
+      const y2 = Math.round(topLeftY + (dy + 1) * px);
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, x2 - x, y2 - y);
+    }
+  }
+}
+
+function draw(world) {
+  const cell = fitCanvas(world);
+  const W = canvas.width, H = canvas.height;
+
+  // pozadí – šachovnice (dlaždice)
+  const light = "#1a1a24";
+  const dark  = "#13131c";
+  for (let x = 0; x < world.cols; x++) {
+    for (let y = 0; y < world.rows; y++) {
+      ctx.fillStyle = (x + y) % 2 === 0 ? light : dark;
+      ctx.fillRect(x * cell, H - (y + 1) * cell, cell, cell);
+    }
+  }
+  // jemná mřížka
+  ctx.strokeStyle = "rgba(255,255,255,0.04)";
+  ctx.lineWidth = 1;
+  for (let x = 1; x < world.cols; x++) {
+    ctx.beginPath();
+    ctx.moveTo(x * cell + 0.5, 0);
+    ctx.lineTo(x * cell + 0.5, H);
+    ctx.stroke();
+  }
+  for (let y = 1; y < world.rows; y++) {
+    ctx.beginPath();
+    ctx.moveTo(0, y * cell + 0.5);
+    ctx.lineTo(W, y * cell + 0.5);
+    ctx.stroke();
+  }
+
+  // značky (pixel-art krystal)
+  for (const [k, n] of world.beepers) {
+    const [x, y] = k.split(",").map(Number);
+    const tlx = x * cell;
+    const tly = H - (y + 1) * cell;
+    drawSprite(BEEPER_SPRITE, BEEPER_PALETTE, tlx, tly, cell, 1);
+    if (n > 1) {
+      ctx.fillStyle = "#0e0e14";
+      ctx.strokeStyle = "#6bd4ff";
+      ctx.lineWidth = 2;
+      ctx.font = `bold ${Math.floor(cell * 0.30)}px "JetBrains Mono", monospace`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const tx = tlx + cell / 2;
+      const ty = tly + cell / 2;
+      ctx.strokeText(String(n), tx, ty);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(String(n), tx, ty);
+    }
+  }
+
+  // stěny – silné pixelové bloky s "cihlovou" texturou
+  const wallMain = "#ff6a00";     // Magexo oranžová
+  const wallHigh = "#ffcc44";     // highlight
+  const wallShad = "#a84300";     // stín
+  const wth = Math.max(4, Math.floor(cell * 0.12)); // tloušťka stěny
+  for (const w of world.walls) {
+    const [x, y, side] = w.split(",");
+    const gx = Number(x), gy = Number(y);
+    if (side === "N") {
+      const px0 = gx * cell;
+      const py  = H - (gy + 1) * cell - Math.floor(wth / 2);
+      ctx.fillStyle = wallShad; ctx.fillRect(px0, py + wth - 2, cell, 2);
+      ctx.fillStyle = wallMain; ctx.fillRect(px0, py, cell, wth);
+      ctx.fillStyle = wallHigh; ctx.fillRect(px0, py, cell, 2);
+    } else if (side === "E") {
+      const px  = (gx + 1) * cell - Math.floor(wth / 2);
+      const py0 = H - (gy + 1) * cell;
+      ctx.fillStyle = wallShad; ctx.fillRect(px + wth - 2, py0, 2, cell);
+      ctx.fillStyle = wallMain; ctx.fillRect(px, py0, wth, cell);
+      ctx.fillStyle = wallHigh; ctx.fillRect(px, py0, 2, cell);
+    }
+  }
+
+  // vnější rámeček
+  ctx.fillStyle = wallMain;
+  ctx.fillRect(0, 0, W, wth);               // horní
+  ctx.fillRect(0, H - wth, W, wth);         // spodní
+  ctx.fillRect(0, 0, wth, H);               // levý
+  ctx.fillRect(W - wth, 0, wth, H);         // pravý
+  ctx.fillStyle = wallHigh;
+  ctx.fillRect(0, 0, W, 2);
+  ctx.fillRect(0, 0, 2, H);
+  ctx.fillStyle = wallShad;
+  ctx.fillRect(0, H - 2, W, 2);
+  ctx.fillRect(W - 2, 0, 2, H);
+
+  // Karel – pixel-art robot
+  const k = world.karel;
+  const tlx = k.x * cell;
+  const tly = H - (k.y + 1) * cell;
+  drawSprite(KAREL_SPRITE, PALETTE, tlx, tly, cell, k.dir);
+}
+
+// =====================================================================
+// UI — nástroje, interakce s městem
+// =====================================================================
+let world = new World(10, 10);
+let savedWorld = world.clone(); // pro Reset
+let tool = "beeper";
+let interp = null;
+let running = false;
+
+const statusEl = document.getElementById("status");
+const editor = document.getElementById("editor");
+const speedEl = document.getElementById("speed");
+const speedVal = document.getElementById("speedVal");
+
+function setStatus(msg, cls = "") {
+  statusEl.textContent = msg;
+  statusEl.className = "status " + cls;
+}
+
+function redraw() { draw(world); }
+function snapshot() { savedWorld = world.clone(); }
+
+// klik na město
+canvas.addEventListener("click", (ev) => {
+  if (running) return;
+  const rect = canvas.getBoundingClientRect();
+  const cell = canvas.width / world.cols;
+  const px = ev.clientX - rect.left;
+  const py = ev.clientY - rect.top;
+  const x = Math.floor(px / cell);
+  const y = world.rows - 1 - Math.floor(py / cell);
+  if (!world.inBounds(x, y)) return;
+
+  if (tool === "beeper") {
+    if (ev.shiftKey) world.removeBeeper(x, y);
+    else world.addBeeper(x, y);
+  } else if (tool === "wall-n") {
+    world.toggleWall(x, y, "N");
+  } else if (tool === "wall-e") {
+    world.toggleWall(x, y, "E");
+  } else if (tool === "karel") {
+    if (world.karel.x === x && world.karel.y === y) {
+      world.karel.dir = (world.karel.dir + 1) % 4; // stejná buňka = otočit
+    } else {
+      world.karel.x = x; world.karel.y = y;
+    }
+  }
+  snapshot();
+  redraw();
+});
+
+// nástroje
+document.querySelectorAll("#toolbar button").forEach(b => {
+  b.addEventListener("click", () => {
+    document.querySelectorAll("#toolbar button").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    tool = b.dataset.tool;
+  });
+});
+
+document.getElementById("clearWorld").addEventListener("click", () => {
+  if (running) return;
+  world = new World(+document.getElementById("cols").value, +document.getElementById("rows").value);
+  snapshot(); redraw(); setStatus("Město vyčištěno.");
+});
+
+function resizeWorld() {
+  if (running) return;
+  const c = +document.getElementById("cols").value;
+  const r = +document.getElementById("rows").value;
+  const nw = new World(c, r);
+  // přenes Karla do rohu, pokud je mimo
+  if (world.karel.x >= c) world.karel.x = c - 1;
+  if (world.karel.y >= r) world.karel.y = r - 1;
+  nw.karel = { ...world.karel };
+  // ořízni stěny a značky
+  for (const w of world.walls) {
+    const [x, y] = w.split(",").map(Number);
+    if (x < c && y < r) nw.walls.add(w);
+  }
+  for (const [k, n] of world.beepers) {
+    const [x, y] = k.split(",").map(Number);
+    if (x < c && y < r) nw.beepers.set(k, n);
+  }
+  world = nw;
+  snapshot(); redraw();
+}
+document.getElementById("cols").addEventListener("change", resizeWorld);
+document.getElementById("rows").addEventListener("change", resizeWorld);
+
+speedEl.addEventListener("input", () => { speedVal.textContent = speedEl.value + " ms"; });
+
+// =====================================================================
+// SPOUŠTĚNÍ
+// =====================================================================
+function compile() {
+  const tokens = tokenize(editor.value);
+  const parser = new Parser(tokens);
+  return parser.parseProgram();
+}
+
+async function runProgram(stepMode = false) {
+  let program;
+  try { program = compile(); }
+  catch (e) { setStatus("⚠ " + e.message, "err"); return; }
+
+  // reset do uloženého stavu
+  world.restore(savedWorld);
+  redraw();
+
+  interp = new Interpreter(program, world);
+  const gen = interp.run();
+  running = true;
+  updateButtons();
+  setStatus("Běží…");
+
+  const delay = () => new Promise(res => setTimeout(res, +speedEl.value));
+
+  try {
+    while (true) {
+      const { value, done } = gen.next();
+      if (done) break;
+      redraw();
+      if (stepMode) { break; }
+      if (interp.stopped) break;
+      if (+speedEl.value > 0) await delay();
+    }
+    if (!stepMode) {
+      setStatus(interp.stopped ? "Zastaveno." : "✓ Hotovo.", interp.stopped ? "" : "ok");
+    } else {
+      setStatus("Krok proveden.");
+      // v krokovacím režimu si necháme generátor v paměti
+      if (!running) return;
+      running = false; updateButtons();
+      window._stepGen = gen; // pokračování na další [Krok]
+      return;
+    }
+  } catch (e) {
+    setStatus("⚠ " + e.message, "err");
+  }
+  running = false;
+  window._stepGen = null;
+  updateButtons();
+  redraw();
+}
+
+function stepProgram() {
+  // pokud už máme probíhající generátor, pokračuj
+  if (window._stepGen) {
+    try {
+      const { done } = window._stepGen.next();
+      redraw();
+      if (done) {
+        window._stepGen = null;
+        setStatus("✓ Hotovo.", "ok");
+      } else {
+        setStatus("Krok proveden.");
+      }
+    } catch (e) {
+      window._stepGen = null;
+      setStatus("⚠ " + e.message, "err");
+    }
+    return;
+  }
+  // jinak spusť nový v krokovacím režimu
+  runProgram(true);
+}
+
+function updateButtons() {
+  document.getElementById("run").disabled = running;
+  document.getElementById("stop").disabled = !running;
+  document.getElementById("step").disabled = running;
+}
+
+document.getElementById("run").addEventListener("click", () => runProgram(false));
+document.getElementById("step").addEventListener("click", stepProgram);
+document.getElementById("stop").addEventListener("click", () => {
+  if (interp) interp.stop();
+  window._stepGen = null;
+});
+document.getElementById("reset").addEventListener("click", () => {
+  if (running && interp) interp.stop();
+  world.restore(savedWorld);
+  window._stepGen = null;
+  redraw();
+  setStatus("Reset.");
+});
+
+// =====================================================================
+// PŘÍKLADY
+// =====================================================================
+const EXAMPLES = {
+  ctverec: {
+    code:
+`NAUČ ČTVEREC
+  OPAKUJ 4-KRÁT
+    OPAKUJ 3-KRÁT
+      KROK
+    *OPAKUJ
+    VLEVO-VBOK
+  *OPAKUJ
+*NAUČ
+
+ČTVEREC`,
+    setup(w) { w.karel = { x: 1, y: 1, dir: DIR.E }; }
+  },
+  posbirej: {
+    code:
+`// posbírá všechny značky v řadě až ke stěně
+DOKUD NENÍ-STĚNA
+  DOKUD JE-ZNAČKA
+    SEBER
+  *DOKUD
+  KROK
+*DOKUD
+// a posbírá i tu poslední
+DOKUD JE-ZNAČKA
+  SEBER
+*DOKUD`,
+    setup(w) {
+      w.karel = { x: 0, y: 4, dir: DIR.E };
+      for (const x of [1, 3, 4, 6, 8]) w.addBeeper(x, 4);
+    }
+  },
+  stena: {
+    code:
+`// dojdi ke stěně a polož značku
+DOKUD NENÍ-STĚNA
+  KROK
+*DOKUD
+POLOŽ`,
+    setup(w) { w.karel = { x: 0, y: 5, dir: DIR.E }; }
+  },
+  schody: {
+    code:
+`NAUČ VPRAVO-VBOK
+  VLEVO-VBOK
+  VLEVO-VBOK
+  VLEVO-VBOK
+*NAUČ
+
+NAUČ SCHOD
+  VPRAVO-VBOK
+  KROK
+  VLEVO-VBOK
+  KROK
+*NAUČ
+
+OPAKUJ 4-KRÁT
+  SCHOD
+*OPAKUJ`,
+    setup(w) {
+      w.karel = { x: 0, y: 0, dir: DIR.N };
+      // postavíme schodiště ze stěn vpravo
+      for (let i = 0; i < 4; i++) {
+        w.toggleWall(i, i, "E");
+        w.toggleWall(i + 1, i, "N");
+      }
+    }
+  },
+  prohodka: {
+    code:
+`NAUČ STRANA
+  DOKUD NENÍ-STĚNA
+    KROK
+  *DOKUD
+  VLEVO-VBOK
+*NAUČ
+
+OPAKUJ 4-KRÁT
+  STRANA
+*OPAKUJ`,
+    setup(w) { w.karel = { x: 0, y: 0, dir: DIR.E }; }
+  },
+};
+
+document.getElementById("examples").addEventListener("change", (ev) => {
+  const k = ev.target.value;
+  if (!k || !EXAMPLES[k]) return;
+  const ex = EXAMPLES[k];
+  editor.value = ex.code;
+  world = new World(+document.getElementById("cols").value, +document.getElementById("rows").value);
+  ex.setup(world);
+  snapshot(); redraw();
+  setStatus(`Načten příklad „${k}".`);
+});
+
+// =====================================================================
+// START
+// =====================================================================
+editor.value =
+`// Vítej! Karel se pohne o 3 políčka a otočí se.
+OPAKUJ 3-KRÁT
+  KROK
+*OPAKUJ
+VLEVO-VBOK
+POLOŽ`;
+snapshot();
+redraw();
+window.addEventListener("resize", redraw);
+</script>
+</body>
+</html>

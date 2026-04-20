@@ -258,6 +258,7 @@
     gap: 14px;
     align-content: start;
   }
+  .btn-grid.three { grid-template-columns: 1fr 1fr 1fr; }
   .bigcmd {
     background: linear-gradient(135deg, #3a3a4a 0%, #2a2a3a 100%);
     border: 2px solid var(--border);
@@ -418,10 +419,16 @@
 
       <h3>🔧 Základní příkazy</h3>
       <div class="cmd-grid">
-        <code>KROK</code>         <span class="desc">posuň se o 1 políčko vpřed (chyba, když je tam stěna)</span>
-        <code>VLEVO-VBOK</code>   <span class="desc">otoč se o 90° doleva</span>
-        <code>POLOŽ</code>        <span class="desc">polož značku na aktuální políčko</span>
-        <code>SEBER</code>        <span class="desc">seber značku z aktuálního políčka (chyba, když tam není)</span>
+        <code>KROK</code>          <span class="desc">posuň se o 1 políčko vpřed (chyba, když je tam stěna)</span>
+        <code>VLEVO-VBOK</code>    <span class="desc">otoč se o 90° <b>doleva</b> — zkráceně <code>VLEVO</code></span>
+        <code>VPRAVO-VBOK</code>   <span class="desc">otoč se o 90° <b>doprava</b> — zkráceně <code>VPRAVO</code> (vnitřně = 3× vlevo)</span>
+        <code>POLOŽ</code>         <span class="desc">polož značku na aktuální políčko (taky <code>POLOZ</code>)</span>
+        <code>SEBER</code>         <span class="desc">seber značku z aktuálního políčka (chyba, když tam není)</span>
+      </div>
+      <div class="tip">
+        ✏️ <b>Zkrácené tvary:</b> <code>VLEVO</code> = <code>VLEVO-VBOK</code>,
+        <code>VPRAVO</code> = <code>VPRAVO-VBOK</code>, <code>VLEVO-BOK</code> / <code>VPRAVO-BOK</code>
+        taky fungují. Můžeš kombinovat — obojí zápis je v pořádku.
       </div>
 
       <h3>🔁 Opakování — OPAKUJ</h3>
@@ -445,18 +452,31 @@
   <span class="kw">KROK</span>
 <span class="kw">*DOKUD</span></pre>
 
-      <h3>🧠 Vlastní procedury — NAUČ</h3>
-      <p>Pojmenovaný blok kódu, který se dá volat jménem. Definice musí být <b>před</b> svým voláním.</p>
-      <pre><span class="kw">NAUČ</span> ČTVEREC
+      <h3>🧠 Vlastní procedury — NAUČ (podprogramy)</h3>
+      <p>Tohle je <b>srdce Karla</b>: pojmenovaný blok kódu, který se dá volat jak kterýkoli jiný příkaz.
+      Tak se v klasickém Karlovi definovaly třeba otočky, tanečky, nebo rozpoznávání vzorů.
+      Definice musí být <b>před</b> svým voláním.</p>
+      <pre><span class="cm">// klasický příklad — naučit Karla "VPRAVO" pomocí 3× vlevo</span>
+<span class="kw">NAUČ</span> VPRAVO
+  <span class="kw">VLEVO-VBOK</span>
+  <span class="kw">VLEVO-VBOK</span>
+  <span class="kw">VLEVO-VBOK</span>
+<span class="kw">*NAUČ</span>
+
+<span class="cm">// definice může volat další vlastní procedury</span>
+<span class="kw">NAUČ</span> ČTVEREC
   <span class="kw">OPAKUJ</span> 4-KRÁT
     <span class="kw">KROK</span>
     <span class="kw">VLEVO-VBOK</span>
   <span class="kw">*OPAKUJ</span>
 <span class="kw">*NAUČ</span>
 
-<span class="cm">// a teď ho použiješ jako normální příkaz:</span>
+<span class="cm">// a teď je používáš jako vestavěné příkazy:</span>
 ČTVEREC
+VPRAVO
 ČTVEREC</pre>
+      <p><b>Tip:</b> <code>VPRAVO-VBOK</code> je už vestavěný, ale klidně si podobné <em>zkratky</em> vyrobíš
+      pro cokoli — např. <code>NAUČ TANEC …</code>, <code>NAUČ POLOŽ-A-KROK …</code>.</p>
 
       <h3>🔍 Podmínky (používají se po KDYŽ / DOKUD)</h3>
       <div class="cmd-grid">
@@ -574,18 +594,22 @@
         Pro mrňousy a začátečníky — klikni na tlačítko a Karel hned poslechne.
         Svět si zachová stav, <b>Reset</b> tě vrátí na začátek.
       </div>
-      <div class="btn-grid">
+      <div class="btn-grid three">
+        <button class="bigcmd primary" data-cmd="VLEVO-VBOK">
+          <span class="glyph">↺</span><span>VLEVO</span>
+        </button>
         <button class="bigcmd primary" data-cmd="KROK">
           <span class="glyph">⬆</span><span>KROK</span>
         </button>
-        <button class="bigcmd primary" data-cmd="VLEVO-VBOK">
-          <span class="glyph">↺</span><span>VLEVO-VBOK</span>
-        </button>
-        <button class="bigcmd" data-cmd="POLOŽ">
-          <span class="glyph">⊕</span><span>POLOŽ značku</span>
+        <button class="bigcmd primary" data-cmd="VPRAVO-VBOK">
+          <span class="glyph">↻</span><span>VPRAVO</span>
         </button>
         <button class="bigcmd" data-cmd="SEBER">
           <span class="glyph">⊖</span><span>SEBER značku</span>
+        </button>
+        <div></div>
+        <button class="bigcmd" data-cmd="POLOŽ">
+          <span class="glyph">⊕</span><span>POLOŽ značku</span>
         </button>
       </div>
       <div class="btn-counter" id="btnCounter">
@@ -735,8 +759,21 @@ const KEYWORDS = new Set([
   "OPAKUJ", "*OPAKUJ", "KRÁT",
   "KDYŽ", "*KDYŽ", "JINAK",
   "DOKUD", "*DOKUD",
-  "KROK", "VLEVO-VBOK", "POLOŽ", "SEBER",
+  "KROK", "VLEVO-VBOK", "VPRAVO-VBOK", "POLOŽ", "SEBER",
 ]);
+// Aliasy — zkrácené / alternativní tvary
+const ALIASES = {
+  "VLEVO":      "VLEVO-VBOK",
+  "VLEVO-BOK":  "VLEVO-VBOK",
+  "VPRAVO":     "VPRAVO-VBOK",
+  "VPRAVO-BOK": "VPRAVO-VBOK",
+  "POLOZ":      "POLOŽ",   // bez háčku
+  "KDYZ":       "KDYŽ",
+  "KRAT":       "KRÁT",
+  "NAUC":       "NAUČ",
+  "*NAUC":      "*NAUČ",
+  "*KDYZ":      "*KDYŽ",
+};
 const CONDITIONS = new Set([
   "JE-STĚNA", "NENÍ-STĚNA", "JE-ZNAČKA", "NENÍ-ZNAČKA",
   "JE-SEVER", "JE-JIH", "JE-VÝCHOD", "JE-ZÁPAD",
@@ -769,7 +806,9 @@ function tokenize(src) {
     while (j < src.length && !/\s/.test(src[j])) j++;
     const raw = src.slice(i, j);
     i = j;
-    const upper = raw.toUpperCase();
+    let upper = raw.toUpperCase();
+    // normalizace aliasů (VLEVO → VLEVO-VBOK, POLOZ → POLOŽ, …)
+    if (ALIASES[upper]) upper = ALIASES[upper];
     if (KEYWORDS.has(upper)) out.push({ type: "KW", value: upper, line });
     else if (CONDITIONS.has(upper)) out.push({ type: "COND", value: upper, line });
     else out.push({ type: "ID", value: upper, line });
@@ -820,6 +859,7 @@ class Parser {
     if (!t) throw new Error("Neočekávaný konec programu.");
     if (t.type === "KW") {
       if (t.value === "KROK" || t.value === "VLEVO-VBOK" ||
+          t.value === "VPRAVO-VBOK" ||
           t.value === "POLOŽ" || t.value === "SEBER") {
         this.eat();
         return { kind: "cmd", name: t.value, line: t.line };
@@ -926,6 +966,10 @@ class Interpreter {
       case "cmd": {
         if (s.name === "KROK") this.world.step();
         else if (s.name === "VLEVO-VBOK") this.world.turnLeft();
+        else if (s.name === "VPRAVO-VBOK") {
+          // vpravo = 3× vlevo (klasická definice)
+          this.world.turnLeft(); this.world.turnLeft(); this.world.turnLeft();
+        }
         else if (s.name === "POLOŽ") this.world.putBeeper();
         else if (s.name === "SEBER") this.world.pickBeeper();
         yield { kind: "tick", line: s.line };
@@ -1402,16 +1446,11 @@ POLOŽ`,
   },
   schody: {
     code:
-`NAUČ VPRAVO-VBOK
-  VLEVO-VBOK
-  VLEVO-VBOK
-  VLEVO-VBOK
-*NAUČ
-
+`// VPRAVO-VBOK je vestavěný (= 3× vlevo). Můžeš psát i zkratku VPRAVO.
 NAUČ SCHOD
-  VPRAVO-VBOK
+  VPRAVO
   KROK
-  VLEVO-VBOK
+  VLEVO
   KROK
 *NAUČ
 
@@ -1566,7 +1605,7 @@ document.querySelectorAll(".bigcmd").forEach(b => {
       btnHistory.push(before);
       if (btnHistory.length > 200) btnHistory.shift();
       if (cmd === "KROK") counters.steps++;
-      else if (cmd === "VLEVO-VBOK") counters.turns++;
+      else if (cmd === "VLEVO-VBOK" || cmd === "VPRAVO-VBOK") counters.turns++;
       else if (cmd === "POLOŽ") counters.put++;
       else if (cmd === "SEBER") counters.pick++;
       updateCounters();
